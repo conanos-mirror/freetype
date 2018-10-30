@@ -29,9 +29,10 @@ class FreetypeConan(ConanFile):
 
     def requirements(self):
         if self.options.with_png:
-            self.requires.add("libpng/1.6.34@conanos/testing")
+            self.requires.add("libpng/1.6.34@conanos/dev")
         if self.options.with_zlib:
-            self.requires.add("bzip2/1.0.6@conanos/testing")
+            self.requires.add("bzip2/1.0.6@conanos/dev")
+            self.requires.add("zlib/1.2.11@conanos/dev")
 
     def config_options(self):
         if self.settings.os == "Windows":
