@@ -23,7 +23,7 @@ class FreetypeConan(ConanFile):
         "with_png": [True, False],
         "with_zlib": [True, False]
     }
-    default_options = {'shared': False, 'fPIC': True, 'with_png': True, 'with_zlib': True}
+    default_options = {'shared': True, 'fPIC': True, 'with_png': True, 'with_zlib': True}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
