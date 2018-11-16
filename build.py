@@ -1,14 +1,5 @@
-
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from conanos.build import Main
 
-import os
-from bincrafters import build_template_default
-
-os.environ['CONAN_USERNAME'] = os.environ.get('CONAN_USERNAME','conanos')
-
-if __name__ == "__main__":
-
-    builder = build_template_default.get_builder()
-
-builder.run()
+if __name__ == "__main__":    
+    Main('freetype',pure_c=True)
