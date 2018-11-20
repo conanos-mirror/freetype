@@ -1,0 +1,13 @@
+diff -Nru freetype-2.9.1/CMakeLists.txt freetype-2.9.1-cmake/CMakeLists.txt
+--- freetype-2.9.1/CMakeLists.txt	2018-05-01 03:45:45.000000000 -0700
++++ freetype-2.9.1-cmake/CMakeLists.txt	2018-11-20 04:01:12.333941026 -0800
+@@ -231,6 +231,9 @@
+     FTCONFIG_H "${FTCONFIG_H}")
+   file(WRITE "${PROJECT_BINARY_DIR}/include/freetype/config/ftconfig.h"
+     "${FTCONFIG_H}")
++else ()
++  file(COPY "${PROJECT_SOURCE_DIR}/include/freetype/config/ftconfig.h"
++       DESTINATION ${PROJECT_BINARY_DIR}/include/freetype/config/)
+ endif ()
+ 
+ 
