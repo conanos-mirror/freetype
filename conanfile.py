@@ -13,7 +13,8 @@ class FreetypeConan(ConanFile):
     homepage = "https://www.freetype.org"
     license = "BSD"
     author = "Bincrafters <bincrafters@gmail.com>"
-    exports = ["LICENSE.md", "FindFreetype.cmake"]
+    patch = "windows-cmake-ftconfig-h.patch"
+    exports = ["LICENSE.md", "FindFreetype.cmake", patch]
     exports_sources = ["CMakeLists.txt", "freetype.pc.in"]
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
@@ -21,9 +22,10 @@ class FreetypeConan(ConanFile):
         "shared": [True, False],
         "fPIC": [True, False],
         "with_png": [True, False],
-        "with_zlib": [True, False]
+        "with_zlib": [True, False],
+        "with_bzip2": [True, False],
     }
-    default_options = {'shared': False, 'fPIC': True, 'with_png': True, 'with_zlib': True}
+    default_options = {'shared': False, 'fPIC': True, 'with_png': True, 'with_zlib': True, 'with_bzip2' : True}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
@@ -32,6 +34,7 @@ class FreetypeConan(ConanFile):
             self.requires.add("libpng/1.6.34@conanos/stable")
         if self.options.with_zlib:
             self.requires.add("zlib/1.2.11@conanos/stable")
+        if self.options.with_bzip2:
             self.requires.add("bzip2/1.0.6@conanos/stable")
 
         config_scheme(self)
@@ -49,6 +52,7 @@ class FreetypeConan(ConanFile):
         archive_file = '{0}-{1}.tar.gz'.format(self.name, version)
         source_file = '{0}/{1}/{2}'.format(source_url, self.name, archive_file)
         tools.get(source_file)
+        tools.patch(patch_file=self.patch)
         os.rename('{0}-{1}'.format(self.name, version), self._source_subfolder)
         if self.version < "2.9.1":
             self._patch_windows()
@@ -82,13 +86,18 @@ class FreetypeConan(ConanFile):
             cmake.definitions["PC_PNG_LIBRARY"] = ''
         if self.options.with_zlib:
             cmake.definitions["PC_ZLIB_LIBRARY"] = '-l%s' % self.deps_cpp_info['zlib'].libs[0]
-            cmake.definitions["PC_BZIP2_LIBRARY"] = '-l%s' % self.deps_cpp_info['bzip2'].libs[0]
         else:
             cmake.definitions["PC_ZLIB_LIBRARY"] = ''
+        if self.options.with_bzip2:
+            cmake.definitions["PC_BZIP2_LIBRARY"] = '-l%s' % self.deps_cpp_info['bzip2'].libs[0]
+        else:
             cmake.definitions["PC_BZIP2_LIBRARY"] = ''
+
         cmake.definitions["PROJECT_VERSION"] = self.version
-        cmake.definitions["WITH_ZLIB"] = self.options.with_zlib
-        cmake.definitions["WITH_PNG"] = self.options.with_png
+        cmake.definitions["FT_WITH_ZLIB"] = self.options.with_zlib
+        cmake.definitions["FT_WITH_BZIP2"] = self.options.with_bzip2
+        cmake.definitions["FT_WITH_PNG"] = self.options.with_png
+        cmake.definitions["FT_WITH_HARFBUZZ"] = False
         cmake.configure(build_dir=self._build_subfolder)
         return cmake
 
@@ -104,6 +113,8 @@ class FreetypeConan(ConanFile):
         self.copy("FTL.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("GPLv2.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         self.copy("LICENSE.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
+        if self.settings.os == "Windows":
+            self.copy("*.dll", dst="bin", src=os.path.join(self._build_subfolder, "bin"))
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
