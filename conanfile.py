@@ -31,6 +31,7 @@ class FreetypeConan(ConanFile):
         if self.options.with_png:
             self.requires.add("libpng/1.6.34@conanos/stable")
         if self.options.with_zlib:
+            self.requires.add("zlib/1.2.11@conanos/stable")
             self.requires.add("bzip2/1.0.6@conanos/stable")
 
         config_scheme(self)
