@@ -115,6 +115,9 @@ class FreetypeConan(ConanFile):
         self.copy("LICENSE.TXT", dst="licenses", src=os.path.join(self._source_subfolder, "docs"))
         if self.settings.os == "Windows":
             self.copy("*.dll", dst="bin", src=os.path.join(self._build_subfolder, "bin"))
+        if self.settings.os == "Linux" and self.settings.build_type == "Debug":
+            with tools.chdir(os.path.join(self.package_folder, "lib")):
+                os.symlink("libfreetyped.so.6", os.path.join(self.package_folder, "lib", "libfreetype.so"))
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
