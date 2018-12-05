@@ -25,7 +25,7 @@ class FreetypeConan(ConanFile):
         "with_zlib": [True, False],
         "with_bzip2": [True, False],
     }
-    default_options = {'shared': False, 'fPIC': True, 'with_png': True, 'with_zlib': True, 'with_bzip2' : True}
+    default_options = {'shared': True, 'fPIC': True, 'with_png': True, 'with_zlib': True, 'with_bzip2' : True}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
@@ -37,14 +37,14 @@ class FreetypeConan(ConanFile):
         if self.options.with_bzip2:
             self.requires.add("bzip2/1.0.6@conanos/stable")
 
-        config_scheme(self)
-
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
 
     def configure(self):
         del self.settings.compiler.libcxx
+
+        config_scheme(self)
 
     def source(self):
         source_url = "https://download.savannah.gnu.org/releases/"
